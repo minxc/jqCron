@@ -19,28 +19,28 @@ var jqCronDefaultSettings = {
 			name_day: 'jour',
 			name_week: 'semaine',
 			name_month: 'mois',
-			name_year: 'année',
+			name_year: 'annÃ©e',
 			text_period: 'Chaque <b />',
-			text_mins: 'à <b /> minutes',
-			text_time: 'à <b />:<b />',
+			text_mins: 'Ã  <b /> minutes',
+			text_time: 'Ã  <b />:<b />',
 			text_dow: 'le <b />',
 			text_month: 'de <b />',
 			text_dom: 'le <b />',
-			error1: 'La balise %s n\'est pas supportée !',
-			error2: 'Mauvais nombre d\'éléments',
-			error3: 'La propriété jquery_element doit être définie dans les paramètres jqCron',
+			error1: 'La balise %s n\'est pas supportÃ©e !',
+			error2: 'Mauvais nombre d\'Ã©lÃ©ments',
+			error3: 'La propriÃ©tÃ© jquery_element doit Ãªtre dÃ©finie dans les paramÃ¨tres jqCron',
 			error4: 'Expression non reconnue',
 			weekdays: ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'],
-			months: ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre']
+			months: ['janvier', 'fÃ©vrier', 'mars', 'avril', 'mai', 'juin', 'juillet', 'aoÃ»t', 'septembre', 'octobre', 'novembre', 'dÃ©cembre']
 		},
 		en : {
 			empty: '-all-',
-			name_minute: 'minute',
-			name_hour: 'hour',
-			name_day: 'day',
-			name_week: 'week',
-			name_month: 'month',
-			name_year: 'year',
+			name_minute: 'Minute',
+			name_hour: 'Hour',
+			name_day: 'Day',
+			name_week: 'Week',
+			name_month: 'Month',
+			name_year: 'Year',
 			text_period: 'Every <b />',
 			text_mins: 'at <b /> minutes past the hour',
 			text_time: 'at <b />:<b />',
@@ -51,8 +51,8 @@ var jqCronDefaultSettings = {
 			error2: 'Bad number of elements',
 			error3: 'The jquery_element should be set into jqCron settings',
 			error4: 'Unrecognized expression',
-			weekdays: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'],
-			months: ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december']
+			weekdays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+			months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 		}
 	},
 	monthdays: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31],
@@ -254,25 +254,34 @@ var jqCronDefaultSettings = {
 		
 		// get cron value
 		this.getCron = function(){
-			var period = _selectorPeriod.getValue();
-			var items = ['*', '*', '*', '*', '*'];
-			if(period == 'hour') {
-				items[0] = _selectorMins.getCronValue();
-			}
-			if(period == 'day' || period == 'week' || period == 'month' || period == 'year') {
-				items[0] = _selectorTimeM.getCronValue();
-				items[1] = _selectorTimeH.getCronValue();
-			}
-			if(period == 'month' || period == 'year') {
-				items[2] = _selectorDom.getCronValue();
-			}
-			if(period == 'year') {
-				items[3] = _selectorMonth.getCronValue();
-			}
-			if(period == 'week') {
-				items[4] = _selectorDow.getCronValue();
-			}
-			return items.join(' ');
+		    var period = _selectorPeriod.getValue();
+
+		    // Add 0 as the first item in the array and increment the array index by 1 when setting the value in the below code
+		    // Added ? where ever applicable in the cron expression to support quartz scheduler
+
+		    var items = ['0','*', '*', '*', '*', '*'];
+		    if(period == 'hour') {
+		        items[1] = _selectorMins.getCronValue();
+		        items[5] = '?';  // To support Quartz
+		    }
+		    if(period == 'day' || period == 'week' || period == 'month' || period == 'year') {
+		        items[1] = _selectorTimeM.getCronValue();
+		        items[2] = _selectorTimeH.getCronValue();
+		        items[5] = '?';  // To support Quartz
+		    }
+		    if(period == 'month' || period == 'year') {
+		        items[3] = _selectorDom.getCronValue();
+		        items[5] = '?';  // To support Quartz
+		    }
+		    if(period == 'year') {
+		        items[4] = _selectorMonth.getCronValue();
+		        items[5] = '?';  // To support Quartz
+		    }
+		    if(period == 'week') {
+		        items[3] = '?';  // To support Quartz
+		        items[5] = _selectorDow.getCronValue();
+		    }
+		    return items.join(' ');
 		};
 		
 		// set cron (string like * * * * *)
